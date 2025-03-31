@@ -7,10 +7,10 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { ProductService } from '../services/product.service';
+import { ProductService } from '../../services/product.service';
 import { FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
-import { CategoryFilterPipe } from '../pipes/category-filter.pipe';
+import { CategoryFilterPipe } from '../../pipes/category-filter.pipe';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -202,12 +202,11 @@ export class ProductsComponent implements OnInit {
   deleteProduct(id: number) {
     if (confirm('¿Estás seguro que deseas eliminar este producto?')) {
       this.productService.deleteProduct(id).subscribe(() => {
-        this.allProducts = this.allProducts.filter(
-          (product) => product.id !== id
-        );
+        this.allProducts = this.allProducts.filter(product => product.id !== id);
+        this.productService.removeProductFromCache(id);
         this.filterProducts();
         this.openModal('Producto eliminado con éxito');
-      });
+      });      
     }
   }
 

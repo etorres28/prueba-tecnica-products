@@ -1,8 +1,30 @@
+<!--
+  Archivo: products.component.html
+  Descripción: Plantilla principal del componente de productos.
+  
+  Funcionalidades:
+  - Buscar productos por nombre
+  - Filtrar productos por categoría
+  - Agregar y editar productos mediante un formulario reactivo
+  - Validaciones en todos los campos del formulario
+  - Listar productos con paginación
+  - Ver detalle de un producto (en ruta /producto/:id)
+  - Confirmar acciones mediante modal Bootstrap
+
+  Este archivo se conecta con:
+  - products.component.ts (lógica)
+  - categoryFilter.pipe.ts (filtro de categoría)
+  - product.service.ts (gestión de datos)
+-->
+
 <div class="container py-4">
   <h2>🛍️ Productos</h2>
 
+  <!-- Header y filtros de búsqueda -->
   <div class="d-flex gap-3 align-items-end mb-3">
     <div class="flex-grow-1">
+
+      <!-- Input para buscar por nombre -->
       <label for="searchInput" class="form-label">Buscar</label>
       <input
         id="searchInput"
@@ -13,6 +35,8 @@
       />
     </div>
     <div>
+
+      <!-- Select para filtrar por categoría existente -->
       <label for="categorySelect" class="form-label">Categoría</label>
       <select
         id="categorySelect"
@@ -31,10 +55,14 @@
         {{ isEditing ? "Editar producto" : "Agregar producto" }}
       </h5>
     </div>
+
+    <!-- Formulario para agregar o editar producto -->
     <div class="card-body">
       <form [formGroup]="form" (ngSubmit)="submitForm()" class="row g-3">
         <div class="col-md-6">
           <label class="form-label">Título</label>
+
+          <!-- Campo Título con validación -->
           <input type="text" class="form-control" formControlName="title" />
           <div
             class="text-danger"
@@ -46,6 +74,8 @@
 
         <div class="col-md-6">
           <label class="form-label">Precio</label>
+
+          <!-- Campo Precio con validación numérica -->
           <input type="number" class="form-control" formControlName="price" />
           <div
             class="text-danger"
@@ -56,6 +86,8 @@
         </div>
 
         <div class="col-12">
+
+          <!-- Campo Descripción con validación -->
           <label class="form-label">Descripción</label>
           <textarea
             class="form-control"
@@ -74,6 +106,8 @@
         </div>
 
         <div class="col-12">
+
+          <!-- Campo Categoría con validación personalizada -->
           <label class="form-label">Categoría</label>
           <select class="form-select" formControlName="category">
             <option value="" disabled selected>Selecciona una categoría</option>
@@ -93,6 +127,7 @@
           </div>
         </div>
 
+        <!-- Botones de acción: Agregar / Actualizar / Cancelar -->
         <div class="col-12 d-flex gap-2">
           <button
             type="submit"
@@ -109,17 +144,7 @@
     </div>
   </div>
 
-  <!--<div *ngFor="let product of displayedProducts" class="card">
-  <h4>{{ product.title }}</h4>
-  <p>{{ product.price | currency }}</p>
-  <img [src]="product.image" width="100" />
-  <div class="d-flex gap-2 mt-2">
-    <button class="btn btn-sm btn-warning" (click)="editProduct(product)">✏️ Editar</button>
-    <button class="btn btn-sm btn-danger" (click)="deleteProduct(product.id)">🗑️ Eliminar</button>
-  </div>
-  
-</div> -->
-
+  <!-- Lista de productos en cards -->
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     <div
       class="col"
@@ -128,6 +153,7 @@
           | categoryFilter : categoryControl.value ?? 'all'
       "
     >
+    <!-- Card de producto -->
       <div class="card h-100">
         <img
           [src]="product.image"
@@ -138,6 +164,8 @@
           <h5 class="card-title">{{ product.title }}</h5>
           <p class="card-text fw-bold">{{ product.price | currency }}</p>
         </div>
+
+        <!-- Botones: Editar / Eliminar / Ver detalle -->
         <div class="card-footer d-flex justify-content-between">
           <button class="btn btn-sm btn-warning" (click)="editProduct(product)">
             ✏️ Editar
@@ -158,8 +186,11 @@
     </div>
   </div>
 
+  <!-- Controles de paginación Bootstrap -->
   <nav class="mt-4 d-flex justify-content-center">
     <ul class="pagination">
+
+      <!-- Anterior / Página actual / Siguiente -->
       <li class="page-item" [class.disabled]="currentPage === 1">
         <button
           class="page-link"
@@ -184,6 +215,7 @@
     </ul>
   </nav>
 
+  <!-- Modal para mostrar mensajes (agregado, editado, eliminado) -->
   <div
     class="modal fade show d-block"
     tabindex="-1"
@@ -213,6 +245,6 @@
     </div>
   </div>
 
-  <!-- Overlay para oscurecer fondo -->
+  <!-- Overlay de fondo oscuro cuando se muestra el modal -->
   <div class="modal-backdrop fade show" *ngIf="showModal"></div>
 </div>
