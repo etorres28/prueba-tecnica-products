@@ -1,0 +1,218 @@
+<div class="container py-4">
+  <h2>🛍️ Productos</h2>
+
+  <div class="d-flex gap-3 align-items-end mb-3">
+    <div class="flex-grow-1">
+      <label for="searchInput" class="form-label">Buscar</label>
+      <input
+        id="searchInput"
+        type="text"
+        class="form-control"
+        [formControl]="searchControl"
+        placeholder="Buscar productos..."
+      />
+    </div>
+    <div>
+      <label for="categorySelect" class="form-label">Categoría</label>
+      <select
+        id="categorySelect"
+        class="form-select"
+        [formControl]="categoryControl"
+      >
+        <option value="all">Todas las categorías</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">
+        {{ isEditing ? "Editar producto" : "Agregar producto" }}
+      </h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="form" (ngSubmit)="submitForm()" class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Título</label>
+          <input type="text" class="form-control" formControlName="title" />
+          <div
+            class="text-danger"
+            *ngIf="form.get('title')?.invalid && form.get('title')?.touched"
+          >
+            El título es obligatorio.
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Precio</label>
+          <input type="number" class="form-control" formControlName="price" />
+          <div
+            class="text-danger"
+            *ngIf="form.get('price')?.invalid && form.get('price')?.touched"
+          >
+            El precio debe ser mayor a 0.
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Descripción</label>
+          <textarea
+            class="form-control"
+            formControlName="description"
+            rows="3"
+          ></textarea>
+          <div
+            class="text-danger"
+            *ngIf="
+              form.get('description')?.invalid &&
+              form.get('description')?.touched
+            "
+          >
+            La descripción es obligatoria.
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Categoría</label>
+          <select class="form-select" formControlName="category">
+            <option value="" disabled selected>Selecciona una categoría</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>          
+          <div
+            class="text-danger"
+            *ngIf="form.get('category')?.errors?.['required'] && form.get('category')?.touched"
+          >
+            La categoría es obligatoria.
+          </div>
+          <div
+            class="text-danger"
+            *ngIf="form.get('category')?.errors?.['invalidCategory'] && form.get('category')?.touched"
+          >
+            La categoría debe ser una de las existentes.
+          </div>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="form.invalid"
+          >
+            {{ isEditing ? "Actualizar" : "Agregar" }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!--<div *ngFor="let product of displayedProducts" class="card">
+  <h4>{{ product.title }}</h4>
+  <p>{{ product.price | currency }}</p>
+  <img [src]="product.image" width="100" />
+  <div class="d-flex gap-2 mt-2">
+    <button class="btn btn-sm btn-warning" (click)="editProduct(product)">✏️ Editar</button>
+    <button class="btn btn-sm btn-danger" (click)="deleteProduct(product.id)">🗑️ Eliminar</button>
+  </div>
+  
+</div> -->
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div
+      class="col"
+      *ngFor="
+        let product of displayedProducts
+          | categoryFilter : categoryControl.value ?? 'all'
+      "
+    >
+      <div class="card h-100">
+        <img
+          [src]="product.image"
+          class="card-img-top p-4"
+          style="height: 200px; object-fit: contain"
+        />
+        <div class="card-body">
+          <h5 class="card-title">{{ product.title }}</h5>
+          <p class="card-text fw-bold">{{ product.price | currency }}</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <button class="btn btn-sm btn-warning" (click)="editProduct(product)">
+            ✏️ Editar
+          </button>
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="deleteProduct(product.id)"
+          >
+            🗑️ Eliminar
+          </button>
+          <a
+            [routerLink]="['/producto', product.id]"
+            class="btn btn-sm btn-info"
+            >🔍 Ver detalle</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="mt-4 d-flex justify-content-center">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button
+          class="page-link"
+          (click)="prevPage()"
+          [disabled]="currentPage === 1"
+        >
+          Anterior
+        </button>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">Página {{ currentPage }}</span>
+      </li>
+      <li class="page-item" [class.disabled]="!hasNextPage()">
+        <button
+          class="page-link"
+          (click)="nextPage()"
+          [disabled]="!hasNextPage()"
+        >
+          Siguiente
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    *ngIf="showModal"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modalTitle }}</h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModal()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ modalMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="closeModal()">
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay para oscurecer fondo -->
+  <div class="modal-backdrop fade show" *ngIf="showModal"></div>
+</div>

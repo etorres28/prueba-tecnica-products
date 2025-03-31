@@ -1,0 +1,16 @@
+<div class="container py-4">
+    <button class="btn btn-link mb-3" (click)="router.navigate(['/'])">⬅️ Volver</button>
+  
+    <div *ngIf="product" class="card">
+      <div class="card-header">
+        <h3>{{ product.title }}</h3>
+      </div>
+      <div class="card-body">
+        <img [src]="product.image" alt="Imagen" class="mb-3" style="max-width: 200px;" />
+        <p><strong>Precio:</strong> {{ product.price | currency }}</p>
+        <p><strong>Categoría:</strong> {{ product.category }}</p>
+        <p><strong>Descripción:</strong> {{ product.description }}</p>
+      </div>
+    </div>
+  </div>
+  
