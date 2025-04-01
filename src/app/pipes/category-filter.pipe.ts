@@ -20,7 +20,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class CategoryFilterPipe implements PipeTransform {
   
-    /**
+  /**
    * Filtra el array de productos por la categoría proporcionada.
    *
    * @param products Arreglo de productos a filtrar.
